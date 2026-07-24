@@ -1,5 +1,6 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { Task } from '../models/task.model';
+import { TaskStorageService } from './task-storage.service';
 
 function createSeedTasks(): Task[] {
   return [
@@ -26,7 +27,9 @@ function createSeedTasks(): Task[] {
 
 @Injectable({ providedIn: 'root' })
 export class TaskService {
-  private readonly tasksState = signal<Task[]>(createSeedTasks());
+  private readonly storage = inject(TaskStorageService);
+
+  private readonly tasksState = signal<Task[]>(this.storage.load() ?? createSeedTasks());
 
   readonly tasks = this.tasksState.asReadonly();
 
@@ -38,21 +41,29 @@ export class TaskService {
       createdAt: new Date(),
     };
     this.tasksState.update((tasks) => [...tasks, task]);
+    this.persist();
   }
 
   updateTask(id: string, changes: Partial<Omit<Task, 'id'>>): void {
     this.tasksState.update((tasks) =>
-      tasks.map((task) => (task.id === id ? { ...task, ...changes } : task))
+      tasks.map((task) => (task.id === id ? { ...task, ...changes } : task)),
     );
+    this.persist();
   }
 
   toggleTask(id: string): void {
     this.tasksState.update((tasks) =>
-      tasks.map((task) => (task.id === id ? { ...task, completed: !task.completed } : task))
+      tasks.map((task) => (task.id === id ? { ...task, completed: !task.completed } : task)),
     );
+    this.persist();
   }
 
   removeTask(id: string): void {
     this.tasksState.update((tasks) => tasks.filter((task) => task.id !== id));
+    this.persist();
+  }
+
+  private persist(): void {
+    this.storage.save(this.tasksState());
   }
 }

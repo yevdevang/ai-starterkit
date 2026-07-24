@@ -1,4 +1,4 @@
-# Current Feature: Beautiful To-Do App — Phase 3: Filtering, Sorting & Counts
+# Current Feature: Beautiful To-Do App — Phase 4: Local Persistence
 
 ## Status
 
@@ -6,11 +6,10 @@ Complete
 
 ## Goals
 
-- All / Active / Completed filter tabs above the task list, driven by a signal (`filter: Signal<'all' | 'active' | 'completed'>`)
-- A `computed()` signal deriving the filtered list shown to the user from the raw task list + current filter — never filter inline in the template
-- Footer showing the remaining active-task count ("3 items left")
-- "Clear completed" action that removes every completed task in one step
-- Optional: a sort toggle (newest/oldest first) by `createdAt`
+- Persist the task list to `localStorage` on every mutation (add/edit/delete/toggle/clear-completed)
+- Load persisted tasks on app startup instead of Phase 1's seed data, falling back to the seed data only when storage is empty
+- Guard every `localStorage` read/write so a corrupted or missing value can't crash the app on load — fall back to an empty task list instead
+- Debounce writes only if profiling shows a real performance cost — don't add that complexity speculatively
 
 ## Notes
 
@@ -18,15 +17,15 @@ Complete
 - Full feature: "Beautiful To-Do App", broken into 6 phases, one prompt file per phase under `context/prompts/`:
   1. `01-foundation-data-model.md` (done — see History)
   2. `02-core-task-crud-ui.md` (done — see History)
-  3. `03-filtering-sorting-counts.md` (this phase)
-  4. `04-local-persistence.md`
+  3. `03-filtering-sorting-counts.md` (done — see History)
+  4. `04-local-persistence.md` (this phase)
   5. `05-beautiful-ui-theming.md`
   6. `06-accessibility-polish.md`
 - Workflow: complete this phase (`/feature start` → implement → `/feature test`/`review` → `/feature complete`), then `/feature load` the next phase's prompt file's contents and repeat — or use `/feature run` per phase for the autonomous loop
-- Purely additive to Phases 1–2 — no changes to the `Task` model
-- Don't touch `TaskService`'s CRUD methods from Phase 1 — this phase only reads and derives from the existing task signal; "Clear completed" can be done by calling the existing `removeTask` once per completed task
-- Filtering state can live in `TaskList` or a small dedicated `TaskFilterService` — whichever keeps `TaskList` doing one job, per the project's component-focus convention
-- Follow `context/best-practices/angular/best-practices.md` and `context/coding-standards.md`'s JS/TS section (signals over manual RxJS for local state, strict typing, no `any`, `@for` with `track`)
+- Persistence stays entirely inside the service layer — `TaskListComponent` and friends should not know `localStorage` is involved
+- Keep persistence logic inside `TaskService`, or delegate to a small dedicated `TaskStorageService` it owns
+- This phase changes *how* `TaskService`'s state is initialized/saved, not its public API — Phases 2–3's components should need zero changes
+- Follow `context/best-practices/angular/best-practices.md` and `context/coding-standards.md`'s JS/TS section (signals over manual RxJS for local state, strict typing, no `any`)
 
 ## History
 
@@ -64,3 +63,17 @@ No changes to `Task` or `TaskService`'s CRUD methods. Added unit tests
 (`task-filter.service.spec.ts` 3 cases, `task-filter-tabs.spec.ts` 4,
 `task-footer.spec.ts` 3, plus 5 new `task-list.spec.ts` cases) — all 36 project tests
 passing. Next up is Phase 4 (`04-local-persistence.md`).
+
+### Beautiful To-Do App — Phase 4: Local Persistence
+
+Added `TaskStorageService` (`src/app/services/task-storage.service.ts`, standalone,
+`providedIn: 'root'`) behind a `TASK_STORAGE` injection token (defaults to
+`localStorage`, structurally typed for easy test fakes). `load()` returns `null` when
+storage is truly empty, `[]` when the stored value is corrupted/invalid, or the revived
+task array (with `createdAt` restored to a `Date`) otherwise; `save()` swallows write
+failures. `TaskService` now initializes from `storage.load() ?? createSeedTasks()` and
+persists after every mutation via a new private `persist()` call in `addTask`/
+`updateTask`/`toggleTask`/`removeTask` — public API unchanged, so Phases 2–3's
+components needed zero edits. No speculative debounce added. Added unit tests
+(`task-storage.service.spec.ts` 7 cases, plus 3 new `task.service.spec.ts` cases) — all
+46 project tests passing. Next up is Phase 5 (`05-beautiful-ui-theming.md`).

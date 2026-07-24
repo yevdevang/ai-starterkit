@@ -1,11 +1,29 @@
 import { TestBed } from '@angular/core/testing';
 import { TaskService } from './task.service';
+import { TASK_STORAGE, TaskStorage } from './task-storage.service';
+import { Task } from '../models/task.model';
+
+class FakeStorage implements TaskStorage {
+  private readonly store = new Map<string, string>();
+
+  getItem(key: string): string | null {
+    return this.store.has(key) ? this.store.get(key)! : null;
+  }
+
+  setItem(key: string, value: string): void {
+    this.store.set(key, value);
+  }
+}
 
 describe('TaskService', () => {
   let service: TaskService;
+  let fakeStorage: FakeStorage;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    fakeStorage = new FakeStorage();
+    TestBed.configureTestingModule({
+      providers: [{ provide: TASK_STORAGE, useValue: fakeStorage }],
+    });
     service = TestBed.inject(TaskService);
   });
 
@@ -65,5 +83,39 @@ describe('TaskService', () => {
     service.updateTask('non-existent-id', { title: 'nope' });
     service.removeTask('non-existent-id');
     expect(service.tasks()).toEqual(before);
+  });
+
+  it('persists every mutation to storage', () => {
+    service.addTask('Persisted task');
+    const stored = JSON.parse(fakeStorage.getItem('ai-todo-list.tasks')!);
+    expect(stored.some((task: { title: string }) => task.title === 'Persisted task')).toBe(true);
+  });
+
+  it('loads persisted tasks instead of the seed data when storage already has tasks', () => {
+    const persisted: Task[] = [
+      { id: 'p1', title: 'From storage', completed: false, createdAt: new Date('2026-02-01') },
+    ];
+    fakeStorage.setItem('ai-todo-list.tasks', JSON.stringify(persisted));
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [{ provide: TASK_STORAGE, useValue: fakeStorage }],
+    });
+    const restarted = TestBed.inject(TaskService);
+
+    expect(restarted.tasks().length).toBe(1);
+    expect(restarted.tasks()[0].title).toBe('From storage');
+  });
+
+  it('falls back to an empty list, not the seed data, when storage is corrupted', () => {
+    fakeStorage.setItem('ai-todo-list.tasks', 'not valid json{{{');
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [{ provide: TASK_STORAGE, useValue: fakeStorage }],
+    });
+    const restarted = TestBed.inject(TaskService);
+
+    expect(restarted.tasks()).toEqual([]);
   });
 });
