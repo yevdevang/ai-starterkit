@@ -1,0 +1,27 @@
+<section class="task-list">
+  <form class="task-list__add" (submit)="onAddSubmit($event, newTaskInput)">
+    <input
+      #newTaskInput
+      type="text"
+      placeholder="What needs to be done?"
+      class="task-list__add-input"
+      aria-label="New task title"
+    />
+    <button type="submit" class="task-list__add-button">Add</button>
+  </form>
+
+  @if (tasks().length === 0) {
+    <p class="task-list__empty">No tasks yet — add one above to get started.</p>
+  } @else {
+    <ul class="task-list__items">
+      @for (task of tasks(); track task.id) {
+        <app-task-item
+          [task]="task"
+          (toggle)="toggleTask(task.id)"
+          (remove)="removeTask(task.id)"
+          (rename)="renameTask(task.id, $event)"
+        />
+      }
+    </ul>
+  }
+</section>
