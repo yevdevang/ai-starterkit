@@ -10,11 +10,18 @@
     <button type="submit" class="task-list__add-button">Add</button>
   </form>
 
-  @if (tasks().length === 0) {
-    <p class="task-list__empty">No tasks yet — add one above to get started.</p>
+  <app-task-filter-tabs
+    [filter]="filter()"
+    [sortOrder]="sortOrder()"
+    (filterChange)="setFilter($event)"
+    (sortOrderChange)="setSortOrder($event)"
+  />
+
+  @if (visibleTasks().length === 0) {
+    <p class="task-list__empty">{{ emptyMessage() }}</p>
   } @else {
     <ul class="task-list__items">
-      @for (task of tasks(); track task.id) {
+      @for (task of visibleTasks(); track task.id) {
         <app-task-item
           [task]="task"
           (toggle)="toggleTask(task.id)"
@@ -24,4 +31,6 @@
       }
     </ul>
   }
+
+  <app-task-footer [activeCount]="activeCount()" (clearCompleted)="clearCompleted()" />
 </section>

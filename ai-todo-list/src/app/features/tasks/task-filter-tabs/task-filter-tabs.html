@@ -1,0 +1,32 @@
+<div class="task-filter-tabs">
+  <div class="task-filter-tabs__filters" role="tablist">
+    <button
+      type="button"
+      class="task-filter-tabs__tab"
+      [class.task-filter-tabs__tab--active]="filter() === 'all'"
+      (click)="filterChange.emit('all')"
+    >
+      All
+    </button>
+    <button
+      type="button"
+      class="task-filter-tabs__tab"
+      [class.task-filter-tabs__tab--active]="filter() === 'active'"
+      (click)="filterChange.emit('active')"
+    >
+      Active
+    </button>
+    <button
+      type="button"
+      class="task-filter-tabs__tab"
+      [class.task-filter-tabs__tab--active]="filter() === 'completed'"
+      (click)="filterChange.emit('completed')"
+    >
+      Completed
+    </button>
+  </div>
+
+  <button type="button" class="task-filter-tabs__sort" (click)="toggleSortOrder()">
+    {{ sortOrder() === 'newest' ? 'Newest first' : 'Oldest first' }}
+  </button>
+</div>

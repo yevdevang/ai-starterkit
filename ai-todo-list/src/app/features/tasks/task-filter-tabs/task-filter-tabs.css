@@ -1,0 +1,17 @@
+.task-filter-tabs {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.task-filter-tabs__filters {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.task-filter-tabs__tab--active {
+  font-weight: bold;
+  text-decoration: underline;
+}

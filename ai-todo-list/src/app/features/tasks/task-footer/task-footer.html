@@ -1,0 +1,8 @@
+<footer class="task-footer">
+  <span class="task-footer__count">
+    {{ activeCount() }} {{ activeCount() === 1 ? 'item' : 'items' }} left
+  </span>
+  <button type="button" class="task-footer__clear" (click)="clearCompleted.emit()">
+    Clear completed
+  </button>
+</footer>

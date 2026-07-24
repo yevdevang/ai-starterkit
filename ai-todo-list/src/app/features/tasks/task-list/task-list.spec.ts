@@ -121,4 +121,98 @@ describe('TaskList', () => {
     fixture.detectChanges();
     expect(fakeService.tasks().length).toBe(0);
   });
+
+  it('filters the visible tasks via the filter tabs', () => {
+    fakeService.seed([
+      { id: '1', title: 'Buy milk', completed: false, createdAt: new Date() },
+      { id: '2', title: 'Walk the dog', completed: true, createdAt: new Date() },
+    ]);
+    const fixture = TestBed.createComponent(TaskList);
+    fixture.detectChanges();
+
+    const tabs: HTMLButtonElement[] =
+      fixture.nativeElement.querySelectorAll('.task-filter-tabs__tab');
+    tabs[1].click(); // Active
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelectorAll('app-task-item').length).toBe(1);
+    expect(fixture.nativeElement.querySelector('.task-item__title').textContent).toContain(
+      'Buy milk',
+    );
+
+    tabs[2].click(); // Completed
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelectorAll('app-task-item').length).toBe(1);
+    expect(fixture.nativeElement.querySelector('.task-item__title').textContent).toContain(
+      'Walk the dog',
+    );
+  });
+
+  it('shows a filter-specific empty message when the filter excludes all tasks', () => {
+    fakeService.seed([{ id: '1', title: 'Buy milk', completed: false, createdAt: new Date() }]);
+    const fixture = TestBed.createComponent(TaskList);
+    fixture.detectChanges();
+
+    const tabs: HTMLButtonElement[] =
+      fixture.nativeElement.querySelectorAll('.task-filter-tabs__tab');
+    tabs[2].click(); // Completed — none match
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.task-list__empty').textContent).toContain(
+      'No tasks match this filter.',
+    );
+  });
+
+  it('shows the remaining active-task count in the footer', () => {
+    fakeService.seed([
+      { id: '1', title: 'Buy milk', completed: false, createdAt: new Date() },
+      { id: '2', title: 'Walk the dog', completed: false, createdAt: new Date() },
+      { id: '3', title: 'Done already', completed: true, createdAt: new Date() },
+    ]);
+    const fixture = TestBed.createComponent(TaskList);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.task-footer__count').textContent).toContain(
+      '2 items left',
+    );
+  });
+
+  it('clears every completed task in one step without touching active tasks', () => {
+    fakeService.seed([
+      { id: '1', title: 'Buy milk', completed: false, createdAt: new Date() },
+      { id: '2', title: 'Walk the dog', completed: true, createdAt: new Date() },
+      { id: '3', title: 'Done already', completed: true, createdAt: new Date() },
+    ]);
+    const fixture = TestBed.createComponent(TaskList);
+    fixture.detectChanges();
+
+    fixture.nativeElement.querySelector('.task-footer__clear').click();
+    fixture.detectChanges();
+
+    expect(fakeService.tasks().length).toBe(1);
+    expect(fakeService.tasks()[0].title).toBe('Buy milk');
+  });
+
+  it('sorts visible tasks by createdAt according to the sort toggle', () => {
+    const older = new Date('2026-01-01');
+    const newer = new Date('2026-06-01');
+    fakeService.seed([
+      { id: '1', title: 'Older task', completed: false, createdAt: older },
+      { id: '2', title: 'Newer task', completed: false, createdAt: newer },
+    ]);
+    const fixture = TestBed.createComponent(TaskList);
+    fixture.detectChanges();
+
+    let titles = Array.from(fixture.nativeElement.querySelectorAll('.task-item__title')).map((el) =>
+      (el as HTMLElement).textContent?.trim(),
+    );
+    expect(titles).toEqual(['Newer task', 'Older task']);
+
+    fixture.nativeElement.querySelector('.task-filter-tabs__sort').click();
+    fixture.detectChanges();
+
+    titles = Array.from(fixture.nativeElement.querySelectorAll('.task-item__title')).map((el) =>
+      (el as HTMLElement).textContent?.trim(),
+    );
+    expect(titles).toEqual(['Older task', 'Newer task']);
+  });
 });
