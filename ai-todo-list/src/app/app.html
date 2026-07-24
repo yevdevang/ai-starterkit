@@ -1,3 +1,17 @@
-<app-task-list />
+<div class="app-shell">
+  <header class="app-header">
+    <h1 class="app-header__title">My Tasks</h1>
+    <button
+      type="button"
+      class="app-header__theme-toggle"
+      (click)="toggleTheme()"
+      [attr.aria-label]="theme() === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'"
+    >
+      {{ theme() === 'dark' ? 'Light mode' : 'Dark mode' }}
+    </button>
+  </header>
+
+  <app-task-list />
+</div>
 
 <router-outlet />

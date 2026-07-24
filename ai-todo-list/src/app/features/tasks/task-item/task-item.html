@@ -1,11 +1,18 @@
-<li class="task-item" [class.task-item--completed]="task().completed">
-  <input
-    type="checkbox"
-    class="task-item__checkbox"
-    [checked]="task().completed"
-    (change)="toggle.emit()"
-    [attr.aria-label]="'Toggle ' + task().title"
-  />
+<li
+  class="task-item"
+  [class.task-item--completed]="task().completed"
+  [class.task-item--removing]="removing()"
+>
+  <label class="task-item__checkbox-wrap">
+    <input
+      type="checkbox"
+      class="task-item__checkbox-input"
+      [checked]="task().completed"
+      (change)="toggle.emit()"
+      [attr.aria-label]="'Toggle ' + task().title"
+    />
+    <span class="task-item__checkbox-box" aria-hidden="true"></span>
+  </label>
 
   @if (editing()) {
     <input
@@ -25,7 +32,7 @@
   <button
     type="button"
     class="task-item__delete"
-    (click)="remove.emit()"
+    (click)="startRemove()"
     [attr.aria-label]="'Delete ' + task().title"
   >
     ✕

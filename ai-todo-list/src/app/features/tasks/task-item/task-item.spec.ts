@@ -35,13 +35,16 @@ describe('TaskItem', () => {
     const emitted: void[] = [];
     fixture.componentInstance.toggle.subscribe(() => emitted.push(undefined));
 
-    const checkbox: HTMLInputElement = fixture.nativeElement.querySelector('.task-item__checkbox');
+    const checkbox: HTMLInputElement = fixture.nativeElement.querySelector(
+      '.task-item__checkbox-input',
+    );
     checkbox.dispatchEvent(new Event('change'));
 
     expect(emitted.length).toBe(1);
   });
 
-  it('emits remove when the delete button is clicked', () => {
+  it('emits remove after the delete button is clicked and the remove animation finishes', () => {
+    vi.useFakeTimers();
     const fixture = setup();
     const emitted: void[] = [];
     fixture.componentInstance.remove.subscribe(() => emitted.push(undefined));
@@ -49,8 +52,17 @@ describe('TaskItem', () => {
     const deleteButton: HTMLButtonElement =
       fixture.nativeElement.querySelector('.task-item__delete');
     deleteButton.click();
+    fixture.detectChanges();
+
+    expect(emitted.length).toBe(0);
+    expect(fixture.nativeElement.querySelector('.task-item').classList).toContain(
+      'task-item--removing',
+    );
+
+    vi.runAllTimers();
 
     expect(emitted.length).toBe(1);
+    vi.useRealTimers();
   });
 
   it('enters edit mode on double-click and shows the current title in an input', () => {

@@ -1,13 +1,40 @@
+@keyframes task-item-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .task-item {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border);
+  animation: task-item-enter var(--transition-base);
+  transition:
+    opacity var(--transition-fast),
+    transform var(--transition-fast),
+    max-height var(--transition-fast);
+  overflow: hidden;
+  max-height: 4rem;
+}
+
+.task-item--removing {
+  opacity: 0;
+  transform: translateX(0.5rem);
+  max-height: 0;
+  padding-block: 0;
+  border-bottom-width: 0;
 }
 
 .task-item--completed .task-item__title {
   text-decoration: line-through;
-  opacity: 0.6;
+  color: var(--color-text-muted);
 }
 
 .task-item__title {
@@ -17,4 +44,79 @@
 
 .task-item__edit-input {
   flex: 1;
+  font: inherit;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.task-item__checkbox-wrap {
+  position: relative;
+  display: inline-flex;
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+
+.task-item__checkbox-input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.task-item__checkbox-box {
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.task-item__checkbox-box::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(20% 50%, 40% 70%, 80% 20%, 90% 32%, 42% 88%, 12% 58%);
+  background: var(--color-primary-contrast);
+  transform: scale(0);
+  transition: transform var(--transition-fast);
+}
+
+.task-item__checkbox-input:checked + .task-item__checkbox-box {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.task-item__checkbox-input:checked + .task-item__checkbox-box::after {
+  transform: scale(1);
+}
+
+.task-item__checkbox-input:focus-visible + .task-item__checkbox-box {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.task-item__delete {
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  padding: var(--space-1);
+  border-radius: var(--radius-sm);
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.task-item__delete:hover {
+  color: var(--color-danger);
+  background: var(--color-bg);
 }

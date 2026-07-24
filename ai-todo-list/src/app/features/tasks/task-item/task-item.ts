@@ -1,6 +1,9 @@
 import { Component, ElementRef, effect, input, output, signal, viewChild } from '@angular/core';
 import { Task } from '../../../models/task.model';
 
+/** Matches the CSS remove-transition duration in task-item.css. */
+const REMOVE_ANIMATION_MS = 180;
+
 @Component({
   selector: 'app-task-item',
   imports: [],
@@ -16,6 +19,7 @@ export class TaskItem {
 
   protected readonly editing = signal(false);
   protected readonly draftTitle = signal('');
+  protected readonly removing = signal(false);
 
   private readonly editInput = viewChild<ElementRef<HTMLInputElement>>('editInput');
 
@@ -47,5 +51,13 @@ export class TaskItem {
 
   protected cancelEdit(): void {
     this.editing.set(false);
+  }
+
+  protected startRemove(): void {
+    if (this.removing()) {
+      return;
+    }
+    this.removing.set(true);
+    setTimeout(() => this.remove.emit(), REMOVE_ANIMATION_MS);
   }
 }

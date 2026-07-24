@@ -99,7 +99,9 @@ describe('TaskList', () => {
     const fixture = TestBed.createComponent(TaskList);
     fixture.detectChanges();
 
-    const checkbox: HTMLInputElement = fixture.nativeElement.querySelector('.task-item__checkbox');
+    const checkbox: HTMLInputElement = fixture.nativeElement.querySelector(
+      '.task-item__checkbox-input',
+    );
     checkbox.dispatchEvent(new Event('change'));
     fixture.detectChanges();
     expect(fakeService.tasks()[0].completed).toBe(true);
@@ -115,10 +117,14 @@ describe('TaskList', () => {
     fixture.detectChanges();
     expect(fakeService.tasks()[0].title).toBe('Buy oat milk');
 
+    vi.useFakeTimers();
     const deleteButton: HTMLButtonElement =
       fixture.nativeElement.querySelector('.task-item__delete');
     deleteButton.click();
     fixture.detectChanges();
+    vi.runAllTimers();
+    fixture.detectChanges();
+    vi.useRealTimers();
     expect(fakeService.tasks().length).toBe(0);
   });
 
