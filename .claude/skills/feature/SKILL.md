@@ -1,7 +1,7 @@
 ---
 name: feature
-description: Manage current feature workflow - start, review, explain, complete, fetch latest main/dev changes, release, or run the full loop autonomously
-argument-hint: load|start|review|test|e2e|explain|complete|fetch|pr|release|run
+description: Manage current feature workflow - start, review, explain, complete, lint+test then commit and push, fetch latest main/dev changes, release, or run the full loop autonomously
+argument-hint: load|start|review|test|e2e|explain|complete|commit-push|fetch|pr|release|run
 model: claude-sonnet-5-5
 ---
 
@@ -36,6 +36,7 @@ Execute the requested action: $ARGUMENTS
 | `e2e`      | Write and run Playwright end-to-end tests for the feature |
 | `explain`  | Document what changed and why                             |
 | `complete` | Commit, push, merge, reset                                |
+| `commit-push [message]` | Run lint and tests; only if both pass, commit and push to the current remote branch |
 | `fetch [branch]` | Fetch and merge latest main/master/dev/development into the current branch |
 | `pr [base]` | Create a pull request for the current branch via `gh` CLI |
 | `release [version]` | Create release branch, merge → main, tag version |
