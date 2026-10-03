@@ -1,0 +1,3 @@
+# Skill eval artifacts (keep SKILL.md and actions/, ignore everything eval-related)
+.claude/skills/*-workspace/
+.claude/skills/*/evals/

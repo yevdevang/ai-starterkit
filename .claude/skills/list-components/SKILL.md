@@ -2,6 +2,7 @@
 name: list-components
 description: List project components
 argument-hint: "subdirectory"
+model: claude-sonnet-5-5
 ---
 
 ## Task

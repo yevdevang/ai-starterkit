@@ -1,6 +1,7 @@
 ---
 name: jasmine
 description: Write and run JavaScript/TypeScript unit tests with Jasmine (Angular's default via karma-jasmine, standalone Node/browser projects)
+model: claude-sonnet-5-5
 ---
 
 # Jasmine
@@ -11,14 +12,14 @@ Reference: https://jasmine.github.io/pages/docs_home.html
 
 - Angular CLI projects (`angular.json` present) that haven't opted into an alternate test builder — `ng test` runs Karma + Jasmine by default
 - `package.json` has `jasmine`, `karma-jasmine`, or `jasmine-core` in `devDependencies`
-- A `karma.conf.js` listing `frameworks: ['jasmine']`, or a standalone `spec/support/jasmine.json`
+- A `karma.conf.js` listing `frameworks: ['jasmine']`, or a standalone `spec/support/jasmine.json` (older Jasmine) / `spec/support/jasmine.mjs` (newer Jasmine, e.g. 7)
 
 ## Setup
 
 Standalone Node project:
 ```bash
 npm install --save-dev jasmine
-npx jasmine init
+npx jasmine init   # creates spec/support/jasmine.json (older) or jasmine.mjs (newer) — check which
 ```
 
 Angular (already the default — nothing to install):
@@ -29,7 +30,7 @@ ng test
 ## File naming & location
 
 - Angular: `*.spec.ts`, co-located next to the file it tests (e.g. `user.service.spec.ts` beside `user.service.ts`) — this is generated automatically by `ng generate`
-- Standalone Node: files under `spec/` matching `spec/support/jasmine.json`'s `spec_files` glob (default `spec/**/*[sS]pec.js`)
+- Standalone Node: files under `spec/` matching the `spec_files` glob in `spec/support/jasmine.json` (or `spec_files` in `jasmine.mjs`) (default `spec/**/*[sS]pec.js`)
 
 ## Basic syntax
 

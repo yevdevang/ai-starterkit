@@ -1,5 +1,6 @@
 ---
 name: vitest
+model: claude-sonnet-5-5
 description: Write and run JavaScript/TypeScript unit tests with Vitest (Vite-based projects — React, Vue, general JS/TS)
 ---
 
@@ -101,8 +102,8 @@ test('resolves data', async () => {
 npx vitest              # watch mode (default)
 vitest run               # single run, no watch — use this in CI / scripted verification
 vitest run path/to/file.test.ts   # single file
-vitest run -t "adds 1 + 2"        # filter by test name
-vitest --coverage         # coverage report
+vitest run -t "adds 1 \+ 2"       # filter by test name (regex: escape + ( ) . etc.)
+vitest run --coverage     # coverage report (needs a provider: npm i -D @vitest/coverage-v8)
 vitest --ui               # browser-based interactive UI
 ```
 

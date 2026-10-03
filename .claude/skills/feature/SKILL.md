@@ -1,7 +1,8 @@
 ---
 name: feature
 description: Manage current feature workflow - start, review, explain, complete, release, or run the full loop autonomously
-argument-hint: load|start|review|test|explain|complete|release|run
+argument-hint: load|start|review|test|e2e|explain|complete|release|run
+model: claude-sonnet-5-5
 ---
 
 # Feature Workflow
@@ -32,6 +33,7 @@ Execute the requested action: $ARGUMENTS
 | `start`    | Begin implementation, create branch                       |
 | `review`   | Check goals met, code quality                             |
 | `test`     | Check for testable logic for server actions and utilities |
+| `e2e`      | Write and run Playwright end-to-end tests for the feature |
 | `explain`  | Document what changed and why                             |
 | `complete` | Commit, push, merge, reset                                |
 | `release [version]` | Create release branch, merge → main, tag version |

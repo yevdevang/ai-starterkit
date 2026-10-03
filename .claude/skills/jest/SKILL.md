@@ -1,6 +1,7 @@
 ---
 name: jest
 description: Write and run JavaScript/TypeScript unit tests with Jest (React, Node, general JS/TS projects)
+model: claude-sonnet-5-5
 ---
 
 # Jest
@@ -21,6 +22,8 @@ npm install --save-dev jest
 npm install --save-dev ts-jest @types/jest   # type-checked
 npm install --save-dev @babel/preset-typescript @jest/globals  # transpile-only
 ```
+
+ts-jest only supports TypeScript versions up to its stated peer range, so a bare `npm install typescript` can pull a version it rejects. Install a compatible one (e.g. `typescript@5`) and check the peer range if the first run fails with a version error. With TypeScript 6+, `types` defaults to `[]`, so `expect`/`describe` fail with "Cannot find name"; add `"types": ["jest", "node"]` to `tsconfig.json`.
 
 `package.json`:
 ```json
@@ -100,7 +103,7 @@ test('resolves data', async () => {
 ```bash
 npm test                          # full suite (via package.json script)
 npx jest path/to/file.test.ts     # single file
-npx jest -t "adds 1 + 2"          # filter by test name
+npx jest -t "adds 1 \+ 2"         # filter by test name (regex: escape + ( ) . etc.)
 npx jest --watch                  # watch mode
 npx jest --coverage               # coverage report
 ```

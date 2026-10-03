@@ -25,6 +25,6 @@ end-to-end from an already-loaded report.
    next attempt will succeed
 6. Run the `test` steps once more as a final full-suite regression check
 7. Run the `explain` steps and show the summary to the user
-8. Run the `complete` steps (commit, push, merge, reset current-fix.md)
+8. Run the `complete` steps (commit, push, reset current-fix.md) — no merge; that stays a separate PR/merge step
 9. Report: root cause, goals implemented, iterations needed per goal (if >1), final test
-   results, and the branch that was merged
+   results, and the branch that was pushed

@@ -1,4 +1,4 @@
-@co# Release Action
+# Release Action
 
 ## Arguments
 Accepts an optional version number (e.g. `/feature release 1.2.0`).

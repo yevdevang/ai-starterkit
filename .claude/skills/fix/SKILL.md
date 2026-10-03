@@ -1,7 +1,8 @@
 ---
 name: fix
 description: Manage current bug fix workflow - load, start, investigate, review, test, explain, complete, or run the full loop autonomously
-argument-hint: load|start|investigate|review|test|explain|complete|run
+argument-hint: load|start|investigate|review|test|e2e|explain|complete|run
+model: claude-sonnet-5-5
 ---
 
 # Fix Workflow
@@ -35,6 +36,7 @@ Execute the requested action: $ARGUMENTS
 | `investigate` | Analyze root cause, identify affected files               |
 | `review`      | Check fix is correct, no regressions, no scope creep      |
 | `test`        | Write/run tests to verify the fix                         |
+| `e2e`      | Write and run Playwright end-to-end tests for the fix |
 | `explain`     | Document what changed and why                             |
 | `complete`    | Commit, push, merge, reset                                |
 | `run`         | Autonomous loop: investigate → start → implement each goal → test → review → fix → repeat until clean → complete |

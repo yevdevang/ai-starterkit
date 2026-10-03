@@ -2,6 +2,7 @@
 name: research
 description: Run a research task to generate documentation
 argument-hint: <prompt-name>
+model: claude-sonnet-5-5
 ---
 
 ## Task
