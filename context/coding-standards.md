@@ -1,139 +1,160 @@
-# Coding Standards
+# Angular Developer Guidelines
 
-## JavaScript / TypeScript
 
-Applies to any project with a `package.json` at the root. Before writing or reviewing
-JS/TS code, detect which framework the project uses and load the matching best-practices
-file for framework-specific guidance:
+When to Activate
 
-- `react`/`react-dom` in `package.json` → React → read `context/best-practices/react/best-practices.md`
-- `@angular/core` in `package.json` (or `angular.json` present) → Angular → read `context/best-practices/angular/best-practices.md`
-- `vue` in `package.json` → Vue → read `context/best-practices/vue/best-practices.md`
-- None of the above, or ambiguous (e.g. more than one present) → ask the user which framework applies before proceeding
-- No `package.json` at all → not a JS/TS project, skip this section
+Working in any Angular project or codebase
+Creating or scaffolding a new Angular project, application, or library
+Generating components, services, directives, pipes, guards, or resolvers
+Implementing reactivity with Angular Signals, `linkedSignal`, or `resource`
+Working with Angular forms (signal forms, reactive forms, or template-driven)
+Setting up dependency injection, routing, lazy loading, or route guards
+Adding accessibility (ARIA), animations, or component styling
+Writing or debugging Angular-specific tests (unit, component harness, E2E)
+Configuring Angular CLI tooling or the Angular MCP server
 
-The rules below apply regardless of framework; the linked file layers on top with
-component/reactivity-model specifics.
+Always analyze the project's Angular version before providing guidance, as best practices and available features can vary significantly between versions. If creating a new project with Angular CLI, do not specify a version unless prompted by the user.
 
-- TypeScript preferred over plain JS for new projects/files; `strict` mode on
-- No `any` — use proper types, generics, or `unknown` + narrowing
-- Types/interfaces/classes: `PascalCase`; functions/variables: `camelCase`; constants that are truly fixed: `UPPER_SNAKE_CASE` or `as const`
-- Prefer `const` over `let`; never `var`
-- No commented-out code, no unused imports/variables, no `console.log` left in committed code (use the project's logger if one exists)
-- Keep functions focused and under ~50 lines when possible; extract rather than nest deeply
-- Write tests via the project's actual test framework — see the `jest`, `vitest`, or `jasmine` skill (whichever applies) for syntax and CLI conventions
+When generating code, follow Angular's style guide and best practices for maintainability and performance. Use the Angular CLI for scaffolding components, services, directives, pipes, and routes to ensure consistency.
 
-## Swift
+Once you finish generating code, run `ng build` to ensure there are no build errors. If there are errors, analyze the error messages and fix them before proceeding. Do not skip this step, as it is critical for ensuring the generated code is correct and functional.
 
-For general Swift language best practices (API design, value vs. reference types,
-optionals, generics, error handling, concurrency), see
-`context/best-practices/swift/best-practices.md`. The rules below are this project's
-own conventions layered on top.
+Creating New Projects
 
-- Swift 5.9+ features preferred (macros, parameter packs where applicable)
-- No `Any` types — use proper typing or generics
-- Define structs/classes for all models, API responses, and data transfer objects
-- Use type inference where obvious, explicit types where it aids readability
-- Prefer `let` over `var`; mutate only when necessary
+If no guidelines are provided by the user, use these defaults when creating a new Angular project:
 
-## SwiftUI
 
-- Functional views only — no UIKit views
-- Use `@Observable` for ViewModels (not `ObservableObject` / `@StateObject`)
-- Use `@State private var viewModel` pattern in views (not `@StateObject`)
-- Keep views focused — one job per view; extract subviews aggressively
-- Extract reusable logic into ViewModels or service layers, not into views
+Use the latest stable version of Angular unless the user specifies otherwise.
+Prefer Signal Forms for new projects only when the target Angular version supports them. [Find out more](references/signal-forms.md).
 
-## ViewModels
+**Execution Rules for `ng new`:**
 
-- All ViewModels use `@Observable` macro
-- ViewModels are instantiated as `@State private var` in the owning view
-- Optional ViewModel pattern for async initialization:
+When asked to create a new Angular project, you must determine the correct execution command by following these strict steps:
 
-```swift
-@State private var viewModel: MyViewModel?
 
-var body: some View {
-    if let viewModel {
-        contentView(viewModel: viewModel)
-    } else {
-        ProgressView("Loading...")
-            .task { await initializeViewModel() }
-    }
-}
-```
+**Step 1: Check for an explicit user version.**
 
-- Use `FetchDescriptor` inside ViewModels for SwiftData queries
-- Use `@Query` only in Views
 
-## Data Layer (SwiftData + iCloud)
+**IF** the user requests a specific version (e.g., Angular 15), bypass local installations and strictly use `npx`.
+**Command:** `npx @angular/cli@<requested_version> new <project-name>`
 
-- **Never store full file paths** in SwiftData models — paths change between simulator builds; store filenames only
-- Use `@Transient` computed properties for large arrays (e.g., `[Float]`) backed by `Data` storage — direct array storage crashes CloudKit sync
-- `AudioFile.fileURL` is always a `@Transient` computed property reconstructed at runtime
-- Two-layer sync: SwiftData+CloudKit for metadata, iCloud Documents for audio files
+**Step 2: Check for an existing Angular installation.**
 
-## Services
 
-- All services are singletons accessed via `.shared`
-- `@MainActor` services (e.g., `AudioImportService`) require `async setUp/tearDown` in tests with initialization delay
-- Always call `reset()` in both `setUp()` and `tearDown()` in singleton tests to prevent state leakage
-- Never call `scanForOrphanedFiles()` on view appear — causes import timeout errors
+**IF** no specific version is requested, run `ng version` in the terminal to check if the Angular CLI is already installed on the system.
+**IF** the command succeeds and returns an installed version, use the local/global installation directly.
+**Command:** `ng new <project-name>`
 
-## File Organization
+**Step 3: Fallback to Latest.**
 
-- Features: `MixDoctor/Features/[Feature]/Views/`, `MixDoctor/Features/[Feature]/ViewModels/`
-- Core services: `MixDoctor/Core/Services/`
-- Models: `MixDoctor/Core/Models/`
-- Extensions: `MixDoctor/Core/Extensions/`
-- Utilities: `MixDoctor/Core/Utilities/`
-- Shared views: `MixDoctor/Core/Views/`
 
-## Naming
+**IF** no specific version is requested AND the `ng version` command fails (indicating no Angular installation exists), you must use `npx` to fetch the latest version.
+**Command:** `npx @angular/cli@latest new <project-name>`
 
-- Types, structs, classes, enums: `PascalCase`
-- Functions, variables, properties: `camelCase`
-- Constants: `camelCase` (Swift convention) or `static let` on a type
-- Files: match the primary type they contain (`AudioFile.swift`, `DashboardView.swift`)
-- SwiftUI views: suffix with `View` (`DashboardView`, `ImportView`)
-- ViewModels: suffix with `ViewModel` (`ImportViewModel`, `AnalysisViewModel`)
+Components
 
-## Styling
+When working with Angular components, consult the following references based on the task:
 
-- SwiftUI only — no UIKit views
-- Primary accent color: `Color(red: 0.435, green: 0.173, blue: 0.871)` (purple)
-- No hardcoded magic numbers — use named constants or design tokens
-- Mac Catalyst UI adjustments must be wrapped in `#if targetEnvironment(macCatalyst)`
 
-## Cross-View Communication
+**Fundamentals**: Anatomy, metadata, core concepts, and template control flow (@if, @for, @switch). Read [components.md](references/components.md)
+**Inputs**: Signal-based inputs, transforms, and model inputs. Read [inputs.md](references/inputs.md)
+**Outputs**: Signal-based outputs and custom event best practices. Read [outputs.md](references/outputs.md)
+**Host Elements**: Host bindings and attribute injection. Read [host-elements.md](references/host-elements.md)
 
-- Use `NotificationCenter` for decoupled cross-view updates:
+If you require deeper documentation not found in the references above, read the documentation at `https://angular.dev/guide/components`.
 
-```swift
-// Post
-NotificationCenter.default.post(name: .audioFileDeleted, object: nil)
 
-// Receive
-.onReceive(NotificationCenter.default.publisher(for: .audioFileDeleted)) { _ in
-    viewModel.loadImports()
-}
-```
+Reactivity and Data Management
 
-## Error Handling
+When managing state and data reactivity, use Angular Signals and consult the following references:
 
-- Use `do/catch` with typed errors where possible
-- Surface user-facing errors through ViewModel `@Published`-equivalent state, not raw alerts in views
-- Log errors via `Logger` (OSLog) — no `print()` in production code
 
-## Subscriptions & Paywall
+**Signals Overview**: Core signal concepts (`signal`, `computed`), reactive contexts, and `untracked`. Read [signals-overview.md](references/signals-overview.md)
+**Dependent State (`linkedSignal`)**: Creating writable state linked to source signals. Read [linked-signal.md](references/linked-signal.md)
+**Async Reactivity (`resource`)**: Fetching asynchronous data directly into signal state. Read [resource.md](references/resource.md)
+**Side Effects (`effect`)**: Logging, third-party DOM manipulation (`afterRenderEffect`), and when NOT to use effects. Read [effects.md](references/effects.md)
 
-- All analysis gating goes through `SubscriptionService.canPerformAnalysis()` — never bypass
-- No free trial UI — all trial references removed; `isInTrialPeriod` kept only for backward compat
-- Use `MockSubscriptionService` + `MockPaywallView` for testing without App Store Connect
+Forms
 
-## Code Quality
+In most cases for new apps, **prefer signal forms**. When making a forms decision, analyze the project and consider the following guidelines:
 
-- No commented-out code unless explicitly noted
-- No unused imports or variables
-- Keep functions under 50 lines when possible
-- No `// TODO` left in committed code unless tracked in an issue
+
+If the application version supports Signal Forms and this is a new form, **prefer signal forms**.
+For older applications or existing forms, match the application's current form strategy.
+
+**Signal Forms**: Use signals for form state management. Read [signal-forms.md](references/signal-forms.md)
+**Template-driven forms**: Use for simple forms. Read [template-driven-forms.md](references/template-driven-forms.md)
+**Reactive forms**: Use for complex forms. Read [reactive-forms.md](references/reactive-forms.md)
+
+Dependency Injection
+
+When implementing dependency injection in Angular, follow these guidelines:
+
+
+**Fundamentals**: Overview of Dependency Injection, services, and the `inject()` function. Read [di-fundamentals.md](references/di-fundamentals.md)
+**Creating and Using Services**: Creating services, the `providedIn: 'root'` option, and injecting into components or other services. Read [creating-services.md](references/creating-services.md)
+**Defining Dependency Providers**: Automatic vs manual provision, `InjectionToken`, `useClass`, `useValue`, `useFactory`, and scopes. Read [defining-providers.md](references/defining-providers.md)
+**Injection Context**: Where `inject()` is allowed, `runInInjectionContext`, and `assertInInjectionContext`. Read [injection-context.md](references/injection-context.md)
+**Hierarchical Injectors**: The `EnvironmentInjector` vs `ElementInjector`, resolution rules, modifiers (`optional`, `skipSelf`), and `providers` vs `viewProviders`. Read [hierarchical-injectors.md](references/hierarchical-injectors.md)
+
+Angular Aria
+
+When building accessible custom components for any of the following patterns: Accordion, Listbox, Combobox, Menu, Tabs, Toolbar, Tree, Grid, consult the following reference:
+
+
+**Angular Aria Components**: Building headless, accessible components (Accordion, Listbox, Combobox, Menu, Tabs, Toolbar, Tree, Grid) and styling ARIA attributes. Read [angular-aria.md](references/angular-aria.md)
+
+Routing
+
+When implementing navigation in Angular, consult the following references:
+
+
+**Define Routes**: URL paths, static vs dynamic segments, wildcards, and redirects. Read [define-routes.md](references/define-routes.md)
+**Route Loading Strategies**: Eager vs lazy loading, and context-aware loading. Read [loading-strategies.md](references/loading-strategies.md)
+**Show Routes with Outlets**: Using `<router-outlet>`, nested outlets, and named outlets. Read [show-routes-with-outlets.md](references/show-routes-with-outlets.md)
+**Navigate to Routes**: Declarative navigation with `RouterLink` and programmatic navigation with `Router`. Read [navigate-to-routes.md](references/navigate-to-routes.md)
+**Control Route Access with Guards**: Implementing `CanActivate`, `CanMatch`, and other guards for security. Read [route-guards.md](references/route-guards.md)
+**Data Resolvers**: Pre-fetching data before route activation with `ResolveFn`. Read [data-resolvers.md](references/data-resolvers.md)
+**Router Lifecycle and Events**: Chronological order of navigation events and debugging. Read [router-lifecycle.md](references/router-lifecycle.md)
+**Rendering Strategies**: CSR, SSG (Prerendering), and SSR with hydration. Read [rendering-strategies.md](references/rendering-strategies.md)
+**Route Transition Animations**: Enabling and customizing the View Transitions API. Read [route-animations.md](references/route-animations.md)
+
+If you require deeper documentation or more context, visit the [official Angular Routing guide](https://angular.dev/guide/routing).
+
+
+Styling and Animations
+
+When implementing styling and animations in Angular, consult the following references:
+
+
+**Using Tailwind CSS with Angular**: Integrating Tailwind CSS into Angular projects. Read [tailwind-css.md](references/tailwind-css.md)
+**Angular Animations**: Using native CSS (recommended) or the legacy DSL for dynamic effects. Read [angular-animations.md](references/angular-animations.md)
+**Styling components**: Best practices for component styles and encapsulation. Read [component-styling.md](references/component-styling.md)
+
+Testing
+
+When writing or updating tests, consult the following references based on the task:
+
+
+**Fundamentals**: Best practices for unit testing, async patterns, and `TestBed`. Read [testing-fundamentals.md](references/testing-fundamentals.md)
+**Component Harnesses**: Standard patterns for robust component interaction. Read [component-harnesses.md](references/component-harnesses.md)
+**Router Testing**: Using `RouterTestingHarness` for reliable navigation tests. Read [router-testing.md](references/router-testing.md)
+**End-to-End (E2E) Testing**: Best practices for E2E tests with Cypress or Playwright. Read [e2e-testing.md](references/e2e-testing.md)
+
+Tooling
+
+When working with Angular tooling, consult the following references:
+
+
+**Angular CLI**: Creating applications, generating code (components, routes, services), serving, and building. Read [cli.md](references/cli.md)
+**Angular MCP Server**: Available tools, configuration, and experimental features. Read [mcp.md](references/mcp.md)
+
+Anti-Patterns
+
+Using `null` or `undefined` as initial signal form field values — use `''`, `0`, or `[]` instead
+Accessing form field state flags without calling the field first: `form.field.valid()` — use `form.field().valid()`
+Starting new forms with older form APIs when the target Angular version supports Signal Forms
+Setting `min`, `max`, `value`, `disabled`, or `readonly` HTML attributes on `[formField]` inputs — define these as schema rules instead
+Calling `inject()` outside an injection context — use `runInInjectionContext` when needed
+Using `effect()` for derived state that should use `computed()`
+Referencing `$parent.$index` in nested `@for` loops — Angular does not support `$parent`; use `let outerIdx = $index` instead
